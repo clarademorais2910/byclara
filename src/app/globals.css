@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Cores By Clara */
+  --color-clara-rosa:     #F9A8D4;
+  --color-clara-amarelo:  #FDE68A;
+  --color-clara-azul:     #93C5FD;
+  --color-clara-lavanda:  #C4B5FD;
+  --color-clara-turquesa: #6EE7B7;
+  --color-clara-coral:    #FCA5A5;
+  --color-clara-fundo:    #FEFCE8;
+  --color-clara-texto:    #1C1917;
+
+  /* Tipografia */
+  --font-display: 'Pacifico', cursive;
+  --font-body:    'Nunito', sans-serif;
+
+  /* Border radius */
+  --radius-soft: 1.25rem;
+  --radius-card: 1.5rem;
+
+  /* Sombras */
+  --shadow-soft:  0 4px 20px rgba(0,0,0,0.06);
+  --shadow-card:  0 2px 12px rgba(0,0,0,0.08);
+  --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
+
+  /* Animações */
+  --animate-float:       float 3s ease-in-out infinite;
+  --animate-shimmer:     shimmer 2s linear infinite;
+  --animate-bounce-soft: bounce-soft 1s ease-in-out infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FEFCE8;
+  color: #1C1917;
+  font-family: 'Nunito', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
