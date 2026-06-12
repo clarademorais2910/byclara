@@ -1,12 +1,15 @@
 'use client'
 import Link from 'next/link'
 import { ShoppingBag, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCartStore } from '@/store/cart'
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const totalItems = useCartStore(s => s.totalItems())
+
+  useEffect(() => { setMounted(true) }, [])
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-clara-rosa/20 shadow-soft">
@@ -31,7 +34,7 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <Link href="/carrinho" className="relative p-2 rounded-2xl hover:bg-clara-rosa/10 transition-colors">
             <ShoppingBag size={22} className="text-clara-texto" />
-            {totalItems > 0 && (
+            {mounted && totalItems > 0 && (
               <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center bg-clara-rosa text-white text-xs font-bold rounded-full">
                 {totalItems > 9 ? '9+' : totalItems}
               </span>
