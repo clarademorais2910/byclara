@@ -1,14 +1,33 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import AddToCartSection from '@/components/produto/AddToCartSection'
-import { ArrowLeft, Package, Clock } from 'lucide-react'
+import ImageGallery from '@/components/produto/ImageGallery'
+import { ArrowLeft, Package, Clock, Share2 } from 'lucide-react'
 
 interface Props {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: p } = await supabase.from('products').select('name, description, images').eq('id', id).single()
+
+  if (!p) return { title: 'Produto não encontrado — By Clara' }
+
+  return {
+    title:       `${p.name} — By Clara`,
+    description: p.description || `Pulseira artesanal ${p.name} feita com amor. Personalize a sua!`,
+    openGraph: {
+      title:       `${p.name} — By Clara`,
+      description: p.description || 'Pulseira de miçangas artesanal e personalizada',
+      images:      p.images?.[0] ? [p.images[0]] : [],
+    },
+  }
 }
 
 export default async function ProdutoPage({ params }: Props) {
@@ -24,51 +43,31 @@ export default async function ProdutoPage({ params }: Props) {
 
   if (!product) notFound()
 
-  const images: string[] = product.images ?? []
+  const shareUrl = `https://clarabyclara.com.br/produto/${id}`
+  const shareText = encodeURIComponent(`Olha essa pulseira linda da By Clara! 🌸\n${shareUrl}`)
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
 
-        <Link href="/catalogo" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-clara-rosa transition-colors mb-6">
-          <ArrowLeft size={16} />
-          Voltar ao catálogo
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/catalogo" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-clara-rosa transition-colors">
+            <ArrowLeft size={16} /> Voltar ao catálogo
+          </Link>
+          <a
+            href={`https://wa.me/?text=${shareText}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-green-500 transition-colors"
+          >
+            <Share2 size={15} /> Compartilhar
+          </a>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <ImageGallery images={product.images ?? []} name={product.name} />
 
-          {/* Imagens */}
-          <div className="space-y-3">
-            <div className="relative w-full aspect-square rounded-card overflow-hidden bg-gradient-to-br from-clara-rosa/10 to-clara-lavanda/10">
-              {images[0] ? (
-                <Image
-                  src={images[0]}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  priority
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-8xl">🌸</span>
-                </div>
-              )}
-            </div>
-
-            {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
-                {images.slice(1).map((img, i) => (
-                  <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-clara-fundo">
-                    <Image src={img} alt={`${product.name} ${i + 2}`} fill className="object-cover" sizes="80px" />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Info + compra */}
           <div className="space-y-5">
             <div>
               <h1 className="font-display text-2xl md:text-3xl text-clara-texto leading-tight">{product.name}</h1>

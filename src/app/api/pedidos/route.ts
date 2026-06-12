@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { generatePixEMV, generateTxId } from '@/lib/pix'
+import { sendNewOrderEmail } from '@/lib/email'
 import QRCode from 'qrcode'
 
 export async function POST(req: NextRequest) {
@@ -8,7 +9,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const supabase = createAdminClient()
 
-    const txId = generateTxId()
+    const txId  = generateTxId()
     const total = parseFloat(body.subtotal) + parseFloat(body.shipping_price)
 
     const pixString = generatePixEMV({
@@ -22,8 +23,7 @@ export async function POST(req: NextRequest) {
     })
 
     const qrCodeBase64 = await QRCode.toDataURL(pixString, {
-      width: 300,
-      margin: 2,
+      width: 300, margin: 2,
       color: { dark: '#1C1917', light: '#FEFCE8' },
     })
 
@@ -54,6 +54,37 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (error) throw error
+
+    // Decrementar estoque
+    for (const item of body.items) {
+      const { data: product } = await supabase
+        .from('products')
+        .select('stock')
+        .eq('id', item.productId)
+        .single()
+
+      if (product && product.stock > 0) {
+        await supabase
+          .from('products')
+          .update({ stock: Math.max(0, product.stock - item.quantity) })
+          .eq('id', item.productId)
+      }
+    }
+
+    // Enviar e-mail de notificação (não bloqueia a resposta)
+    sendNewOrderEmail({
+      orderId:       order.id,
+      customerName:  body.customer_name,
+      customerPhone: body.customer_phone,
+      customerEmail: body.customer_email,
+      cidade:        body.cidade,
+      estado:        body.estado,
+      shippingLabel: body.shipping_label,
+      items:         body.items,
+      subtotal:      body.subtotal,
+      shippingPrice: body.shipping_price,
+      total,
+    }).catch(err => console.error('Erro ao enviar e-mail:', err))
 
     return NextResponse.json({
       order,

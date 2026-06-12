@@ -1,14 +1,15 @@
 'use client'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingBag, Image, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, Image, LogOut, Menu, X, Settings } from 'lucide-react'
 import { useState } from 'react'
 
 const NAV = [
-  { href: '/admin/dashboard', label: 'Dashboard',  icon: LayoutDashboard },
-  { href: '/admin/pedidos',   label: 'Pedidos',     icon: ShoppingBag     },
-  { href: '/admin/produtos',  label: 'Produtos',    icon: Package         },
-  { href: '/admin/banners',   label: 'Banners',     icon: Image           },
+  { href: '/admin/dashboard',     label: 'Dashboard',    icon: LayoutDashboard },
+  { href: '/admin/pedidos',       label: 'Pedidos',       icon: ShoppingBag     },
+  { href: '/admin/produtos',      label: 'Produtos',      icon: Package         },
+  { href: '/admin/banners',       label: 'Banners',       icon: Image           },
+  { href: '/admin/configuracoes', label: 'Configurações', icon: Settings        },
 ]
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
