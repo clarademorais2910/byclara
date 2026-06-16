@@ -1,8 +1,6 @@
 import { Resend } from 'resend'
 import { formatPrice } from './utils'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 interface OrderItem {
   name: string
   quantity: number
@@ -32,6 +30,8 @@ export async function sendNewOrderEmail(order: OrderEmailData) {
     console.log('RESEND_API_KEY não configurado — e-mail não enviado')
     return
   }
+
+  const resend = new Resend(process.env.RESEND_API_KEY)
 
   const itemsHtml = order.items.map(item => `
     <tr>

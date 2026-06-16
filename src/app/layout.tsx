@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Pacifico, Nunito } from 'next/font/google'
 import './globals.css'
-import { Toaster } from 'react-hot-toast'
+import ToasterClient from '@/components/ToasterClient'
 
 const pacifico = Pacifico({
   weight: '400',
@@ -32,16 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className={`${pacifico.variable} ${nunito.variable}`}>
       <body className="font-body bg-clara-fundo text-clara-texto antialiased">
         {children}
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            style: {
-              borderRadius: '1rem',
-              fontFamily: 'Nunito, sans-serif',
-              fontSize: '14px',
-            },
-          }}
-        />
+        <ToasterClient />
       </body>
     </html>
   )
