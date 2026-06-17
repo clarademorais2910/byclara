@@ -1,10 +1,18 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
 import { formatPrice } from '@/lib/utils'
 import { MapPin, User, Truck, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
+
+function formatPhone(value: string): string {
+  const d = value.replace(/\D/g, '').slice(0, 11)
+  if (d.length <= 2)  return d.length ? `(${d}` : ''
+  if (d.length <= 6)  return d.replace(/^(\d{2})(\d+)$/, '($1) $2')
+  if (d.length <= 10) return d.replace(/^(\d{2})(\d{4})(\d+)$/, '($1) $2-$3')
+  return d.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3')
+}
 
 type Step = 'dados' | 'entrega' | 'revisar'
 
@@ -48,11 +56,11 @@ export default function CheckoutForm() {
   const [freteOpcoes, setFreteOpcoes] = useState<OpcaoFrete[]>([])
   const [freteSelecionado, setFreteSelecionado] = useState<OpcaoFrete | null>(null)
 
-  // Redirect se carrinho vazio
-  if (items.length === 0) {
-    router.replace('/catalogo')
-    return null
-  }
+  useEffect(() => {
+    if (items.length === 0) router.replace('/catalogo')
+  }, [items.length, router])
+
+  if (items.length === 0) return null
 
   async function buscarCep(value: string) {
     const cleaned = value.replace(/\D/g, '')
@@ -164,9 +172,9 @@ export default function CheckoutForm() {
           </div>
           <div>
             <label className="text-xs font-semibold text-gray-500 block mb-1">WhatsApp *</label>
-            <input value={telefone} onChange={e => setTelefone(e.target.value)}
+            <input value={telefone} onChange={e => setTelefone(formatPhone(e.target.value))}
               className="w-full border-2 border-gray-200 focus:border-clara-rosa rounded-2xl px-4 py-3 text-sm outline-none transition-colors"
-              placeholder="(62) 99999-9999" type="tel" />
+              placeholder="(62) 99999-9999" type="tel" inputMode="numeric" />
           </div>
           <div>
             <label className="text-xs font-semibold text-gray-500 block mb-1">E-mail (opcional)</label>

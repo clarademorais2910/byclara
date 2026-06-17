@@ -4,7 +4,6 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import PixPayment from '@/components/pedido/PixPayment'
 import { generatePixEMV } from '@/lib/pix'
-import QRCode from 'qrcode'
 import { Package, MapPin, Truck } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import Link from 'next/link'
@@ -34,7 +33,6 @@ export default async function PedidoPage({ params }: Props) {
 
   if (!order) notFound()
 
-  // Gerar Pix
   const pixString = generatePixEMV({
     key:          process.env.PIX_KEY!,
     keyType:      (process.env.PIX_KEY_TYPE || 'PHONE') as 'PHONE' | 'CPF' | 'EMAIL' | 'EVP',
@@ -43,11 +41,6 @@ export default async function PedidoPage({ params }: Props) {
     amount:       order.total,
     txId:         order.pix_txid,
     description:  'Pedido By Clara',
-  })
-
-  const qrCode = await QRCode.toDataURL(pixString, {
-    width: 220, margin: 2,
-    color: { dark: '#1C1917', light: '#FEFCE8' },
   })
 
   const status = STATUS_LABELS[order.status] ?? { label: order.status, color: 'text-gray-500' }
@@ -73,7 +66,6 @@ export default async function PedidoPage({ params }: Props) {
         {order.status === 'aguardando_pagamento' && (
           <PixPayment
             pixString={pixString}
-            qrCode={qrCode}
             total={order.total}
             expiresAt={order.pix_expires_at}
           />

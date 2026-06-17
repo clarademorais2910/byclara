@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { generatePixEMV, generateTxId } from '@/lib/pix'
 import { sendNewOrderEmail } from '@/lib/email'
-import QRCode from 'qrcode'
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -20,11 +18,6 @@ export async function POST(req: NextRequest) {
       amount:       total,
       txId,
       description:  'Pedido By Clara',
-    })
-
-    const qrCodeBase64 = await QRCode.toDataURL(pixString, {
-      width: 300, margin: 2,
-      color: { dark: '#1C1917', light: '#FEFCE8' },
     })
 
     const { data: order, error } = await supabase
@@ -55,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error
 
-    // Decrementar estoque
+    // Decrementar estoque com optimistic lock: só atualiza se stock não mudou desde a leitura
     for (const item of body.items) {
       const { data: product } = await supabase
         .from('products')
@@ -63,11 +56,12 @@ export async function POST(req: NextRequest) {
         .eq('id', item.productId)
         .single()
 
-      if (product && product.stock > 0) {
+      if (product && product.stock >= item.quantity) {
         await supabase
           .from('products')
-          .update({ stock: Math.max(0, product.stock - item.quantity) })
+          .update({ stock: product.stock - item.quantity })
           .eq('id', item.productId)
+          .eq('stock', product.stock)
       }
     }
 
@@ -90,7 +84,6 @@ export async function POST(req: NextRequest) {
       order,
       pix: {
         string:    pixString,
-        qrCode:    qrCodeBase64,
         txId,
         total,
         expiresAt: order.pix_expires_at,

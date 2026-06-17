@@ -1,18 +1,25 @@
 'use client'
-import { useState } from 'react'
-import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { Copy, Check } from 'lucide-react'
 import toast from 'react-hot-toast'
+import QRCode from 'qrcode'
 
 interface Props {
   pixString: string
-  qrCode: string
   total: number
   expiresAt: string
 }
 
-export default function PixPayment({ pixString, qrCode, total, expiresAt }: Props) {
+export default function PixPayment({ pixString, total, expiresAt }: Props) {
   const [copied, setCopied] = useState(false)
+  const [qrCode, setQrCode] = useState('')
+
+  useEffect(() => {
+    QRCode.toDataURL(pixString, {
+      width: 300, margin: 2,
+      color: { dark: '#1C1917', light: '#FEFCE8' },
+    }).then(setQrCode)
+  }, [pixString])
 
   async function copyPix() {
     await navigator.clipboard.writeText(pixString)
@@ -42,8 +49,11 @@ export default function PixPayment({ pixString, qrCode, total, expiresAt }: Prop
 
       {/* QR Code */}
       <div className="flex justify-center">
-        <div className="border-4 border-clara-rosa/20 rounded-2xl p-3 inline-block">
-          <Image src={qrCode} alt="QR Code Pix" width={200} height={200} className="rounded-xl" />
+        <div className="border-4 border-clara-rosa/20 rounded-2xl p-3 inline-block min-h-[208px] flex items-center justify-center">
+          {qrCode
+            ? <img src={qrCode} alt="QR Code Pix" width={200} height={200} className="rounded-xl" />
+            : <div className="w-[200px] h-[200px] bg-gray-100 rounded-xl animate-pulse" />
+          }
         </div>
       </div>
 
