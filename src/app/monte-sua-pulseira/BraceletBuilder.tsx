@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Shuffle, Trash2, ShoppingBag, MessageCircle, Check, Eraser, Plus, Minus } from 'lucide-react'
+import { Shuffle, Trash2, ShoppingBag, MessageCircle, Check, Plus, Minus } from 'lucide-react'
 import { useCartStore } from '@/store/cart'
 import toast from 'react-hot-toast'
 
@@ -32,7 +32,7 @@ const SIZES = [
   { v: '18 cm', d: 'Largo'    }, { v: '19 cm', d: 'Extra'   },
 ]
 
-const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789♥🌸'.split('')
+const LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789♥★']
 
 const TEMPLATES: { name: string; fn: () => Bead[] }[] = [
   { name: '🌈 Arco-íris', fn: () => {
@@ -136,7 +136,7 @@ export default function BraceletBuilder() {
   /* ─── helpers ─── */
   function insertName() {
     if (!nameInput.trim()) return
-    const letters = nameInput.toUpperCase().replace(/[^A-Z0-9♥]/g, '').split('')
+    const letters = nameInput.toUpperCase().replace(/[^A-Z0-9♥★]/g, '').split('')
     setBeads(bs => {
       const next = [...bs]
       let slot = 0
@@ -167,22 +167,20 @@ export default function BraceletBuilder() {
   }
 
   function addToCart() {
-    const { hexes, names, letters } = buildSummary()
-    for (let u = 0; u < qty; u++) {
-      addItem({
-        id: `custom-${Date.now()}-${u}`,
-        productId: 'custom',
-        name: letters ? `Pulseira "${letters}"` : 'Pulseira Personalizada',
-        price: 39.90,
-        image: '',
-        weightGrams: 14,
-        quantity: 1,
-        personalizacao: {
-          nomePersonalizado: letters || undefined,
-          coresEscolhidas: hexes,
-        },
-      })
-    }
+    const { hexes, letters } = buildSummary()
+    addItem({
+      id: `custom-${Date.now()}`,
+      productId: 'custom',
+      name: letters ? `Pulseira "${letters}"` : 'Pulseira Personalizada',
+      price: 39.90,
+      image: '',
+      weightGrams: 14,
+      quantity: qty,
+      personalizacao: {
+        nomePersonalizado: letters || undefined,
+        coresEscolhidas: hexes,
+      },
+    })
     setAdded(true)
     toast.success(qty > 1 ? `${qty} pulseiras adicionadas! 🌸` : 'Pulseira adicionada ao carrinho! 🌸')
     setTimeout(() => setAdded(false), 3000)
@@ -303,6 +301,7 @@ export default function BraceletBuilder() {
                   <input
                     value={nameInput}
                     onChange={e => setName(e.target.value.slice(0, 12))}
+                    onKeyDown={e => e.key === 'Enter' && insertName()}
                     placeholder="Inserir nome automático…"
                     className="flex-1 border-2 border-gray-200 focus:border-clara-rosa rounded-xl px-3 py-2 text-sm outline-none transition-colors"
                   />
