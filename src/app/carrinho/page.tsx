@@ -6,9 +6,35 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
+import { useState, useEffect } from 'react'
 
 export default function CarrinhoPage() {
   const { items, removeItem, updateQty, subtotal } = useCartStore()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
+          <div className="h-8 w-48 bg-gray-100 rounded-2xl animate-pulse mb-6" />
+          <div className="space-y-3">
+            {[1, 2].map(i => (
+              <div key={i} className="bg-white rounded-card shadow-card p-4 flex gap-4">
+                <div className="w-20 h-20 rounded-xl bg-gray-100 animate-pulse flex-shrink-0" />
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="h-4 bg-gray-100 rounded animate-pulse w-3/4" />
+                  <div className="h-4 bg-gray-100 rounded animate-pulse w-1/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
 
   if (items.length === 0) {
     return (

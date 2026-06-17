@@ -115,40 +115,51 @@ export default function AddToCartSection({ product }: Props) {
       )}
 
       {/* Quantidade */}
-      <div>
-        <p className="text-sm font-semibold text-clara-texto mb-2">Quantidade</p>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setQty(q => Math.max(1, q - 1))}
-            className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center hover:border-clara-rosa transition-colors"
-          >
-            <Minus size={16} />
-          </button>
-          <span className="font-semibold text-lg w-6 text-center">{qty}</span>
-          <button
-            onClick={() => setQty(q => Math.min(product.stock || 99, q + 1))}
-            className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center hover:border-clara-rosa transition-colors"
-          >
-            <Plus size={16} />
-          </button>
+      {product.stock > 0 && (
+        <div>
+          <p className="text-sm font-semibold text-clara-texto mb-2">Quantidade</p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setQty(q => Math.max(1, q - 1))}
+              className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center hover:border-clara-rosa transition-colors"
+            >
+              <Minus size={16} />
+            </button>
+            <span className="font-semibold text-lg w-6 text-center">{qty}</span>
+            <button
+              onClick={() => setQty(q => Math.min(product.stock, q + 1))}
+              disabled={qty >= product.stock}
+              className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center hover:border-clara-rosa transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Plus size={16} />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Botões */}
       <div className="flex flex-col gap-3 pt-2">
-        <button
-          onClick={handleBuyNow}
-          className="w-full bg-clara-rosa text-white font-semibold py-3.5 rounded-2xl hover:brightness-95 active:scale-95 transition-all shadow-soft"
-        >
-          Comprar agora
-        </button>
-        <button
-          onClick={handleAddToCart}
-          className="w-full flex items-center justify-center gap-2 border-2 border-clara-rosa text-clara-rosa font-semibold py-3 rounded-2xl hover:bg-clara-rosa/5 active:scale-95 transition-all"
-        >
-          <ShoppingBag size={18} />
-          Adicionar ao carrinho
-        </button>
+        {product.stock === 0 ? (
+          <div className="w-full bg-gray-100 text-gray-400 font-semibold py-3.5 rounded-2xl text-center">
+            Esgotado — fale pelo WhatsApp para encomendar
+          </div>
+        ) : (
+          <>
+            <button
+              onClick={handleBuyNow}
+              className="w-full bg-clara-rosa text-white font-semibold py-3.5 rounded-2xl hover:brightness-95 active:scale-95 transition-all shadow-soft"
+            >
+              Comprar agora
+            </button>
+            <button
+              onClick={handleAddToCart}
+              className="w-full flex items-center justify-center gap-2 border-2 border-clara-rosa text-clara-rosa font-semibold py-3 rounded-2xl hover:bg-clara-rosa/5 active:scale-95 transition-all"
+            >
+              <ShoppingBag size={18} />
+              Adicionar ao carrinho
+            </button>
+          </>
+        )}
       </div>
     </div>
   )
