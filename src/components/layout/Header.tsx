@@ -25,6 +25,9 @@ export default function Header() {
           <Link href="/catalogo" className="hover:text-clara-rosa transition-colors">
             Catálogo
           </Link>
+          <Link href="/monte-sua-pulseira" className="flex items-center gap-1.5 bg-clara-rosa text-white px-3.5 py-1.5 rounded-full hover:brightness-95 transition-all">
+            🌸 Monte a Sua
+          </Link>
           <Link href="/encomendas" className="hover:text-clara-rosa transition-colors">
             Encomendas
           </Link>
@@ -56,6 +59,9 @@ export default function Header() {
         <div className="md:hidden bg-white border-t border-clara-rosa/20 px-4 py-4 flex flex-col gap-4">
           <Link href="/catalogo" className="font-semibold text-clara-texto hover:text-clara-rosa" onClick={() => setMenuOpen(false)}>
             Catálogo
+          </Link>
+          <Link href="/monte-sua-pulseira" className="font-semibold text-clara-rosa" onClick={() => setMenuOpen(false)}>
+            🌸 Monte a Sua
           </Link>
           <Link href="/encomendas" className="font-semibold text-clara-texto hover:text-clara-rosa" onClick={() => setMenuOpen(false)}>
             Encomendas
