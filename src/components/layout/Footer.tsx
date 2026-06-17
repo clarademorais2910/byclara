@@ -27,9 +27,11 @@ export default function Footer() {
             </svg>
             Falar no WhatsApp
           </a>
-          <div className="flex gap-4 text-sm text-gray-400">
-            <Link href="/catalogo" className="hover:text-clara-rosa transition-colors">Catálogo</Link>
-            <Link href="/carrinho" className="hover:text-clara-rosa transition-colors">Carrinho</Link>
+          <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-400">
+            <Link href="/catalogo"           className="hover:text-clara-rosa transition-colors">Catálogo</Link>
+            <Link href="/monte-sua-pulseira" className="hover:text-clara-rosa transition-colors">Monte a Sua</Link>
+            <Link href="/encomendas"         className="hover:text-clara-rosa transition-colors">Encomendas</Link>
+            <Link href="/carrinho"           className="hover:text-clara-rosa transition-colors">Carrinho</Link>
           </div>
         </div>
 

@@ -57,8 +57,9 @@ export default function BraceletBuilder() {
       PALETTE[Math.floor(Math.random() * PALETTE.length)].hex
     ))
 
-  const colorNames = () =>
-    [...new Set(colors)].map(hex => PALETTE.find(p => p.hex === hex)?.name ?? hex)
+  const uniqueHex   = () => [...new Set(colors)]
+  const toNames     = (hexList: string[]) =>
+    hexList.map(hex => PALETTE.find(p => p.hex === hex)?.name ?? hex)
 
   const addToCart = () => {
     addItem({
@@ -71,7 +72,7 @@ export default function BraceletBuilder() {
       quantity: 1,
       personalizacao: {
         nomePersonalizado: name.trim() || undefined,
-        coresEscolhidas: colorNames(),
+        coresEscolhidas: uniqueHex(), // hex so cart can render colored dots
       },
     })
     setAdded(true)
@@ -82,7 +83,7 @@ export default function BraceletBuilder() {
   const openWhatsApp = () => {
     const msg = [
       'Olá Clara! Montei minha pulseira personalizada:',
-      `Cores: ${colorNames().join(', ')}`,
+      `Cores: ${toNames(uniqueHex()).join(', ')}`,
       name.trim() ? `Nome: ${name.trim()}` : null,
       'Quero encomendar! 🌸',
     ].filter(Boolean).join('\n')
@@ -216,15 +217,15 @@ export default function BraceletBuilder() {
       </div>
 
       {/* Summary */}
-      {[...new Set(colors)].length > 1 && (
+      {uniqueHex().length > 1 && (
         <div className="bg-clara-fundo rounded-2xl px-4 py-3 flex items-center gap-3">
           <div className="flex gap-1 flex-wrap">
-            {[...new Set(colors)].map(hex => (
+            {uniqueHex().map(hex => (
               <div key={hex} className="w-4 h-4 rounded-full ring-1 ring-black/10" style={{ backgroundColor: hex }} />
             ))}
           </div>
           <p className="text-xs text-gray-500">
-            {[...new Set(colors)].length} cores · {colorNames().join(', ')}
+            {uniqueHex().length} cores · {toNames(uniqueHex()).join(', ')}
           </p>
         </div>
       )}

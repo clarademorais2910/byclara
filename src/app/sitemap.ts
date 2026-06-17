@@ -18,8 +18,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   return [
-    { url: base,             lastModified: new Date(), changeFrequency: 'daily',  priority: 1   },
-    { url: `${base}/catalogo`, lastModified: new Date(), changeFrequency: 'daily',  priority: 0.9 },
+    { url: base,                              lastModified: new Date(), changeFrequency: 'daily',   priority: 1   },
+    { url: `${base}/catalogo`,                lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
+    { url: `${base}/monte-sua-pulseira`,      lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${base}/encomendas`,              lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     ...productUrls,
   ]
 }
