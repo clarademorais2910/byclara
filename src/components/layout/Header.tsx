@@ -25,7 +25,7 @@ export default function Header() {
           <Link href="/catalogo" className="hover:text-clara-rosa transition-colors">
             Catálogo
           </Link>
-          <Link href="/catalogo#encomendas" className="hover:text-clara-rosa transition-colors">
+          <Link href="/encomendas" className="hover:text-clara-rosa transition-colors">
             Encomendas
           </Link>
         </nav>
@@ -57,7 +57,7 @@ export default function Header() {
           <Link href="/catalogo" className="font-semibold text-clara-texto hover:text-clara-rosa" onClick={() => setMenuOpen(false)}>
             Catálogo
           </Link>
-          <Link href="/catalogo#encomendas" className="font-semibold text-clara-texto hover:text-clara-rosa" onClick={() => setMenuOpen(false)}>
+          <Link href="/encomendas" className="font-semibold text-clara-texto hover:text-clara-rosa" onClick={() => setMenuOpen(false)}>
             Encomendas
           </Link>
         </div>
