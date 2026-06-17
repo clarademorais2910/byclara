@@ -7,11 +7,6 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn().mockResolvedValue({ set: mockCookieSet }),
 }))
 
-async function importRoute() {
-  const mod = await import('@/app/api/admin/login/route')
-  return mod.POST
-}
-
 function makeLoginReq(body: unknown): NextRequest {
   return new NextRequest('https://clarabyclara.com.br/api/admin/login', {
     method: 'POST',
@@ -21,11 +16,13 @@ function makeLoginReq(body: unknown): NextRequest {
 }
 
 describe('POST /api/admin/login — autenticação', () => {
-  let POST: Awaited<ReturnType<typeof importRoute>>
+  let POST: (req: NextRequest) => Promise<Response>
 
   beforeEach(async () => {
     mockCookieSet.mockClear()
-    POST = await importRoute()
+    vi.resetModules()
+    const mod = await import('@/app/api/admin/login/route')
+    POST = mod.POST
   })
 
   it('senha correta retorna 200 e define cookie httpOnly', async () => {
@@ -63,7 +60,7 @@ describe('POST /api/admin/login — autenticação', () => {
     expect(res.status).toBe(200)
   })
 
-  it('password muito longo retorna 401 (não vaza timing)', async () => {
+  it('password muito longo retorna 401', async () => {
     const res = await POST(makeLoginReq({ password: 'a'.repeat(10_000) }))
     expect(res.status).toBe(401)
   })
@@ -75,5 +72,69 @@ describe('POST /api/admin/login — autenticação', () => {
       expect.any(String),
       expect.objectContaining({ sameSite: 'strict' })
     )
+  })
+})
+
+describe('POST /api/admin/login — rate limiting', () => {
+  let POST: (req: NextRequest) => Promise<Response>
+
+  // Cada describe usa resetModules para obter uma instância limpa do Map
+  beforeEach(async () => {
+    mockCookieSet.mockClear()
+    vi.resetModules()
+    const mod = await import('@/app/api/admin/login/route')
+    POST = mod.POST
+  })
+
+  it('bloqueia com 429 após 5 tentativas erradas do mesmo IP', async () => {
+    const req = () => {
+      const r = makeLoginReq({ password: 'errada' })
+      // Simula mesmo IP via header x-forwarded-for
+      return new NextRequest(r, {
+        headers: { ...Object.fromEntries(r.headers), 'x-forwarded-for': '1.2.3.4' },
+      })
+    }
+
+    for (let i = 0; i < 5; i++) await POST(req())
+
+    const res = await POST(req())
+    expect(res.status).toBe(429)
+  })
+
+  it('login com senha correta reseta o contador de tentativas', async () => {
+    const makeReqWithIp = (body: unknown) => {
+      const r = makeLoginReq(body)
+      return new NextRequest(r, {
+        headers: { ...Object.fromEntries(r.headers), 'x-forwarded-for': '5.6.7.8' },
+      })
+    }
+
+    // 4 tentativas erradas
+    for (let i = 0; i < 4; i++) await POST(makeReqWithIp({ password: 'errada' }))
+
+    // Login com sucesso reseta o contador
+    await POST(makeReqWithIp({ password: process.env.ADMIN_PASSWORD }))
+
+    // Mais 4 tentativas erradas devem funcionar (contador foi zerado)
+    for (let i = 0; i < 4; i++) {
+      const res = await POST(makeReqWithIp({ password: 'errada' }))
+      expect(res.status).toBe(401) // ainda 401, não 429
+    }
+  })
+
+  it('IPs diferentes têm contadores independentes', async () => {
+    const makeReqWithIp = (ip: string) => {
+      const r = makeLoginReq({ password: 'errada' })
+      return new NextRequest(r, {
+        headers: { ...Object.fromEntries(r.headers), 'x-forwarded-for': ip },
+      })
+    }
+
+    // Esgota IP 10.0.0.1
+    for (let i = 0; i < 5; i++) await POST(makeReqWithIp('10.0.0.1'))
+    expect((await POST(makeReqWithIp('10.0.0.1'))).status).toBe(429)
+
+    // IP 10.0.0.2 ainda está livre
+    expect((await POST(makeReqWithIp('10.0.0.2'))).status).toBe(401)
   })
 })

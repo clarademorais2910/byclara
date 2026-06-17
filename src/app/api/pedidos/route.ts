@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { generatePixEMV, generateTxId } from '@/lib/pix'
-import { sendNewOrderEmail } from '@/lib/email'
+import { sendNewOrderEmail, sendOrderConfirmationEmail } from '@/lib/email'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -65,8 +65,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Enviar e-mail de notificação (não bloqueia a resposta)
-    sendNewOrderEmail({
+    const emailData = {
       orderId:       order.id,
       customerName:  body.customer_name,
       customerPhone: body.customer_phone,
@@ -78,7 +77,11 @@ export async function POST(req: NextRequest) {
       subtotal:      body.subtotal,
       shippingPrice: body.shipping_price,
       total,
-    }).catch(err => console.error('Erro ao enviar e-mail:', err))
+    }
+
+    // Ambos os e-mails não bloqueiam a resposta
+    sendNewOrderEmail(emailData).catch(err => console.error('Erro ao enviar e-mail admin:', err))
+    sendOrderConfirmationEmail(emailData).catch(err => console.error('Erro ao enviar e-mail cliente:', err))
 
     return NextResponse.json({
       order,

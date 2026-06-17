@@ -16,7 +16,8 @@ vi.mock('@/lib/supabase/admin', () => ({
 }))
 
 vi.mock('@/lib/email', () => ({
-  sendNewOrderEmail: vi.fn(),
+  sendNewOrderEmail:             vi.fn(),
+  sendOrderConfirmationEmail:    vi.fn(),
 }))
 
 const MOCK_ORDER = {
@@ -77,9 +78,10 @@ describe('POST /api/pedidos — validação de entrada', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    // Restaura mock de email para retornar Promise (evita .catch em undefined)
-    const { sendNewOrderEmail } = await import('@/lib/email')
-    vi.mocked(sendNewOrderEmail).mockResolvedValue(undefined)
+    // Restaura mocks de email para retornar Promise (evita .catch em undefined)
+    const email = await import('@/lib/email')
+    vi.mocked(email.sendNewOrderEmail).mockResolvedValue(undefined)
+    vi.mocked(email.sendOrderConfirmationEmail).mockResolvedValue(undefined)
     setupHappyPath()
     const mod = await import('@/app/api/pedidos/route')
     POST = mod.POST
@@ -156,8 +158,9 @@ describe('POST /api/pedidos — controle de estoque', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    const { sendNewOrderEmail } = await import('@/lib/email')
-    vi.mocked(sendNewOrderEmail).mockResolvedValue(undefined)
+    const email = await import('@/lib/email')
+    vi.mocked(email.sendNewOrderEmail).mockResolvedValue(undefined)
+    vi.mocked(email.sendOrderConfirmationEmail).mockResolvedValue(undefined)
     const mod = await import('@/app/api/pedidos/route')
     POST = mod.POST
   })
