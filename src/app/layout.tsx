@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Pacifico, Nunito } from 'next/font/google'
 import './globals.css'
 import ToasterClient from '@/components/ToasterClient'
+import WhatsAppButton from '@/components/ui/WhatsAppButton'
 
 const pacifico = Pacifico({
   weight: '400',
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-body bg-clara-fundo text-clara-texto antialiased">
         {children}
         <ToasterClient />
+        <WhatsAppButton />
       </body>
     </html>
   )

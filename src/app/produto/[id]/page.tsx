@@ -46,8 +46,31 @@ export default async function ProdutoPage({ params }: Props) {
   const shareUrl = `https://clarabyclara.com.br/produto/${id}`
   const shareText = encodeURIComponent(`Olha essa pulseira linda da By Clara! 🌸\n${shareUrl}`)
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description ?? undefined,
+    image: product.images ?? [],
+    url: shareUrl,
+    brand: { '@type': 'Brand', name: 'By Clara' },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'BRL',
+      price: product.price.toFixed(2),
+      availability: product.stock > 0
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/PreOrder',
+      seller: { '@type': 'Organization', name: 'By Clara' },
+    },
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
 
