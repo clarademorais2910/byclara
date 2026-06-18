@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { proxy } from '@/proxy'
+import { middleware as proxy } from '@/middleware'
 import type { NextRequest } from 'next/server'
 
 function makeReq(pathname: string, token?: string): NextRequest {

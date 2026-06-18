@@ -25,6 +25,9 @@ export const metadata: Metadata = {
     title: 'By Clara — Pulseiras de Miçangas',
     description: 'Pulseiras artesanais e personalizadas com amor ✨',
     type: 'website',
+    url: 'https://clarabyclara.com.br',
+    siteName: 'By Clara',
+    locale: 'pt_BR',
   },
 }
 

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart'
 import { formatPrice } from '@/lib/utils'
@@ -41,6 +41,7 @@ export default function CheckoutForm() {
   const { items, subtotal, totalWeight, clearCart } = useCartStore()
   const [step, setStep] = useState<Step>('dados')
   const [loading, setLoading] = useState(false)
+  const submitted = useRef(false)
 
   // Step 1 — dados pessoais
   const [nome, setNome]       = useState('')
@@ -57,7 +58,7 @@ export default function CheckoutForm() {
   const [freteSelecionado, setFreteSelecionado] = useState<OpcaoFrete | null>(null)
 
   useEffect(() => {
-    if (items.length === 0) router.replace('/catalogo')
+    if (items.length === 0 && !submitted.current) router.replace('/catalogo')
   }, [items.length, router])
 
   if (items.length === 0) return null
@@ -120,6 +121,7 @@ export default function CheckoutForm() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
+      submitted.current = true
       clearCart()
       router.push(`/pedido/${data.order.id}`)
     } catch {

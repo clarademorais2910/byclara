@@ -39,8 +39,8 @@ export function isEntregaLocal(cidade: string, estado: string): boolean {
   const cidadeBase = process.env.FRETE_LOCAL_CIDADE || 'Itaberaí'
   const estadoBase = process.env.FRETE_LOCAL_ESTADO || 'GO'
   return (
-    cidade.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '') ===
-    cidadeBase.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '') &&
+    cidade.toLowerCase().normalize('NFD').replace(/[\u0300-\u036F]/g, '') ===
+    cidadeBase.toLowerCase().normalize('NFD').replace(/[\u0300-\u036F]/g, '') &&
     estado.toUpperCase() === estadoBase.toUpperCase()
   )
 }

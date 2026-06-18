@@ -33,15 +33,17 @@ export default async function PedidoPage({ params }: Props) {
 
   if (!order) notFound()
 
-  const pixString = generatePixEMV({
-    key:          process.env.PIX_KEY!,
-    keyType:      (process.env.PIX_KEY_TYPE || 'PHONE') as 'PHONE' | 'CPF' | 'EMAIL' | 'EVP',
-    merchantName: process.env.PIX_MERCHANT_NAME || 'By Clara',
-    merchantCity: process.env.PIX_MERCHANT_CITY || 'Itaberai',
-    amount:       order.total,
-    txId:         order.pix_txid,
-    description:  'Pedido By Clara',
-  })
+  const pixString = order.status === 'aguardando_pagamento'
+    ? generatePixEMV({
+        key:          process.env.PIX_KEY!,
+        keyType:      (process.env.PIX_KEY_TYPE || 'PHONE') as 'PHONE' | 'CPF' | 'EMAIL' | 'EVP',
+        merchantName: process.env.PIX_MERCHANT_NAME || 'By Clara',
+        merchantCity: process.env.PIX_MERCHANT_CITY || 'Itaberai',
+        amount:       order.total,
+        txId:         order.pix_txid,
+        description:  'Pedido By Clara',
+      })
+    : ''
 
   const status = STATUS_LABELS[order.status] ?? { label: order.status, color: 'text-gray-500' }
   const whatsapp = `https://wa.me/5562996394315?text=Olá!%20Acabei%20de%20fazer%20o%20pedido%20%23${id.slice(0, 8).toUpperCase()}%20e%20já%20realizei%20o%20pagamento!`

@@ -30,12 +30,16 @@ function getResend(): Resend | null {
   return new Resend(process.env.RESEND_API_KEY)
 }
 
+function esc(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 function buildItemsHtml(items: OrderItem[]): string {
   return items.map(item => `
     <tr>
       <td style="padding: 8px 0; border-bottom: 1px solid #f3f3f3;">
-        <strong>${item.name}</strong> ×${item.quantity}
-        ${item.personalizacao?.nomePersonalizado ? `<br><small>Nome: ${item.personalizacao.nomePersonalizado}</small>` : ''}
+        <strong>${esc(item.name)}</strong> ×${item.quantity}
+        ${item.personalizacao?.nomePersonalizado ? `<br><small>Nome: ${esc(item.personalizacao.nomePersonalizado)}</small>` : ''}
       </td>
       <td style="padding: 8px 0; border-bottom: 1px solid #f3f3f3; text-align: right;">
         ${formatPrice(item.price * item.quantity)}
@@ -66,7 +70,7 @@ export async function sendNewOrderEmail(order: OrderEmailData) {
         </div>
         <div style="background: white; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #f0f0f0;">
           <h2 style="color: #F9A8D4; margin-top: 0;">Cliente</h2>
-          <p style="margin: 4px 0;"><strong>${order.customerName}</strong></p>
+          <p style="margin: 4px 0;"><strong>${esc(order.customerName)}</strong></p>
           <p style="margin: 4px 0; color: #666;">${order.customerPhone}</p>
           ${order.customerEmail ? `<p style="margin: 4px 0; color: #666;">${order.customerEmail}</p>` : ''}
           <p style="margin: 4px 0; color: #666;">${order.cidade}/${order.estado}</p>
@@ -119,7 +123,7 @@ export async function sendOrderConfirmationEmail(order: OrderEmailData) {
           <p style="color: white; margin: 8px 0 0; opacity: 0.9;">Seu pedido foi recebido! 🌸</p>
         </div>
         <div style="background: white; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #f0f0f0;">
-          <p style="margin: 0 0 16px;">Olá, <strong>${order.customerName}</strong>! 😊</p>
+          <p style="margin: 0 0 16px;">Olá, <strong>${esc(order.customerName)}</strong>! 😊</p>
           <p style="color: #666; margin: 0 0 20px;">
             Recebemos seu pedido <strong>#${shortId}</strong>. Assim que o pagamento Pix for confirmado, começamos a produzir com muito carinho!
           </p>

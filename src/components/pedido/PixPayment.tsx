@@ -98,7 +98,7 @@ export default function PixPayment({ pixString, total, expiresAt }: Props) {
         <>
           {/* QR Code */}
           <div className="flex justify-center">
-            <div className={`border-4 rounded-2xl p-3 inline-block min-h-[208px] flex items-center justify-center transition-colors ${
+            <div className={`border-4 rounded-2xl p-3 inline-flex items-center justify-center min-h-[208px] transition-colors ${
               isUrgent ? 'border-red-300' : 'border-clara-rosa/20'
             }`}>
               {qrCode
