@@ -1,5 +1,8 @@
 // Consulta CEP via ViaCEP e calcula frete
 
+const cepCache = new Map<string, { data: Endereco; ts: number }>()
+const CEP_TTL = 10 * 60 * 1000
+
 export interface Endereco {
   cep: string
   logradouro: string
@@ -20,12 +23,15 @@ export async function buscarEndereco(cep: string): Promise<Endereco> {
   const cleaned = cep.replace(/\D/g, '')
   if (cleaned.length !== 8) throw new Error('CEP inválido')
 
+  const cached = cepCache.get(cleaned)
+  if (cached && Date.now() - cached.ts < CEP_TTL) return cached.data
+
   const res = await fetch(`https://viacep.com.br/ws/${cleaned}/json/`)
   const data = await res.json()
 
   if (data.erro) throw new Error('CEP não encontrado')
 
-  return {
+  const endereco: Endereco = {
     cep: data.cep,
     logradouro: data.logradouro || '',
     bairro: data.bairro || '',
@@ -33,6 +39,8 @@ export async function buscarEndereco(cep: string): Promise<Endereco> {
     estado: data.uf,
     valid: true,
   }
+  cepCache.set(cleaned, { data: endereco, ts: Date.now() })
+  return endereco
 }
 
 export function isEntregaLocal(cidade: string, estado: string): boolean {

@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { Heart } from 'lucide-react'
+import { WHATSAPP } from '@/lib/config'
 
 export default function Footer() {
-  const whatsapp = '5562996394315'
-  const whatsappLink = `https://wa.me/${whatsapp}?text=Olá!%20Vim%20pelo%20site%20da%20By%20Clara%20e%20quero%20saber%20mais%20sobre%20as%20pulseiras!`
+  const whatsappLink = `https://wa.me/${WHATSAPP}?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20By%20Clara%20e%20quero%20saber%20mais%20sobre%20as%20pulseiras!`
 
   return (
     <footer className="bg-white border-t border-clara-rosa/20 mt-16">

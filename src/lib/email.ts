@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { formatPrice } from './utils'
+import { WHATSAPP } from './config'
 
 interface OrderItem {
   name: string
@@ -109,7 +110,7 @@ export async function sendOrderConfirmationEmail(order: OrderEmailData) {
 
   const itemsHtml  = buildItemsHtml(order.items)
   const orderUrl   = `https://clarabyclara.com.br/pedido/${order.orderId}`
-  const whatsappUrl = `https://wa.me/5562996394315?text=Olá!%20Fiz%20o%20pedido%20%23${order.orderId.slice(0, 8).toUpperCase()}%20e%20tenho%20uma%20dúvida.`
+  const whatsappUrl = `https://wa.me/${WHATSAPP}?text=Olá!%20Fiz%20o%20pedido%20%23${order.orderId.slice(0, 8).toUpperCase()}%20e%20tenho%20uma%20dúvida.`
   const shortId    = order.orderId.slice(0, 8).toUpperCase()
 
   await resend.emails.send({

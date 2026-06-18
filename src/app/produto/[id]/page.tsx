@@ -7,15 +7,21 @@ import Footer from '@/components/layout/Footer'
 import AddToCartSection from '@/components/produto/AddToCartSection'
 import ImageGallery from '@/components/produto/ImageGallery'
 import { ArrowLeft, Package, Clock, Share2 } from 'lucide-react'
+import { cache } from 'react'
 
 interface Props {
   params: Promise<{ id: string }>
 }
 
+const getProduct = cache(async (id: string) => {
+  const supabase = await createClient()
+  const { data } = await supabase.from('products').select('*').eq('id', id).eq('active', true).single()
+  return data
+})
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: p } = await supabase.from('products').select('name, description, images').eq('id', id).single()
+  const p = await getProduct(id)
 
   if (!p) return { title: 'Produto não encontrado — By Clara' }
 
@@ -32,14 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProdutoPage({ params }: Props) {
   const { id } = await params
-  const supabase = await createClient()
-
-  const { data: product } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', id)
-    .eq('active', true)
-    .single()
+  const product = await getProduct(id)
 
   if (!product) notFound()
 

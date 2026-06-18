@@ -5,26 +5,40 @@ import BannerSlider from '@/components/home/BannerSlider'
 import FeaturedProducts from '@/components/home/FeaturedProducts'
 import Link from 'next/link'
 import { Sparkles, Package, Heart } from 'lucide-react'
+import { WHATSAPP } from '@/lib/config'
 
-export const revalidate = 60
+export const revalidate = 300
 
 async function getData() {
   const supabase = await createClient()
 
-  const [{ data: banners }, { data: products }] = await Promise.all([
+  const [{ data: banners }, { data: products }, { data: settings }] = await Promise.all([
     supabase.from('banners').select('*').eq('active', true).order('position'),
     supabase.from('products').select('*').eq('active', true).eq('featured', true).order('position').limit(8),
+    supabase.from('settings').select('key,value').in('key', ['store_open']),
   ])
 
-  return { banners: banners ?? [], products: products ?? [] }
+  const cfg: Record<string, string> = {}
+  for (const s of settings ?? []) cfg[s.key] = s.value
+
+  return { banners: banners ?? [], products: products ?? [], storeOpen: cfg.store_open !== 'false' }
 }
 
 export default async function Home() {
-  const { banners, products } = await getData()
+  const { banners, products, storeOpen } = await getData()
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
+      {!storeOpen && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 text-center">
+          <p className="text-sm text-amber-700 font-semibold">
+            🛑 A loja está temporariamente fechada — novas encomendas não estão sendo aceitas no momento.
+            {' '}<a href={`https://wa.me/${WHATSAPP}?text=Ol%C3%A1!%20Vi%20que%20a%20loja%20est%C3%A1%20fechada.%20Quando%20volta?`} className="underline hover:text-amber-900" target="_blank" rel="noopener noreferrer">Fale comigo no WhatsApp</a>
+          </p>
+        </div>
+      )}
 
       <main className="flex-1">
         {/* Banner */}
@@ -79,7 +93,7 @@ export default async function Home() {
               <p className="text-white/90 text-sm mt-1">Fala comigo pelo WhatsApp, respondo rapidinho! 💬</p>
             </div>
             <a
-              href="https://wa.me/5562996394315?text=Olá!%20Vim%20pelo%20site%20e%20quero%20saber%20mais!"
+              href={`https://wa.me/${WHATSAPP}?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais!`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-shrink-0 bg-white text-clara-rosa font-semibold px-6 py-3 rounded-2xl hover:scale-105 transition-transform shadow-md text-sm"

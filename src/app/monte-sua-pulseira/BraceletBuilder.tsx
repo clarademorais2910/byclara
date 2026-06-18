@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { Shuffle, Trash2, ShoppingBag, MessageCircle, Check, Plus, Minus } from 'lucide-react'
+import { WHATSAPP } from '@/lib/config'
 import { useCartStore } from '@/store/cart'
 import toast from 'react-hot-toast'
 
@@ -201,7 +202,7 @@ export default function BraceletBuilder() {
       qty > 1 ? `Quantidade: ${qty} unidades` : null,
       'Quero encomendar! 🌸',
     ].filter(Boolean).join('\n')
-    window.open(`https://wa.me/5562996394315?text=${encodeURIComponent(msg)}`, '_blank')
+    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   /* ─── tab config ─── */

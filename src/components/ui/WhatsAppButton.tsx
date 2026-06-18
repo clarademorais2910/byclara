@@ -1,9 +1,10 @@
 'use client'
+import { WHATSAPP } from '@/lib/config'
 
 export default function WhatsAppButton() {
   return (
     <a
-      href="https://wa.me/5562996394315?text=Olá!%20Vim%20pelo%20site%20e%20quero%20saber%20mais!"
+      href={`https://wa.me/${WHATSAPP}?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais!`}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar no WhatsApp"

@@ -5,6 +5,22 @@ import { sendNewOrderEmail, sendOrderConfirmationEmail } from '@/lib/email'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
+
+    const required = ['customer_name', 'customer_phone', 'cep', 'logradouro', 'numero', 'shipping_type', 'shipping_price', 'subtotal']
+    for (const f of required) {
+      if (body[f] === undefined || body[f] === null || body[f] === '') {
+        return NextResponse.json({ error: `Campo obrigatório ausente: ${f}` }, { status: 400 })
+      }
+    }
+    if (!Array.isArray(body.items) || body.items.length === 0) {
+      return NextResponse.json({ error: 'Carrinho não pode estar vazio' }, { status: 400 })
+    }
+    const subtotal = parseFloat(body.subtotal)
+    const shipping = parseFloat(body.shipping_price)
+    if (isNaN(subtotal) || subtotal <= 0 || isNaN(shipping) || shipping < 0) {
+      return NextResponse.json({ error: 'Valores inválidos' }, { status: 400 })
+    }
+
     const supabase = createAdminClient()
 
     const txId  = generateTxId()

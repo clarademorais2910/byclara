@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react'
 import { Copy, Check, Clock } from 'lucide-react'
 import toast from 'react-hot-toast'
 import QRCode from 'qrcode'
+import { WHATSAPP } from '@/lib/config'
 
 interface Props {
   pixString: string
   total: number
   expiresAt: string
+  orderId: string
 }
 
 function formatTimeLeft(ms: number): string {
@@ -17,11 +19,12 @@ function formatTimeLeft(ms: number): string {
   return `${min}:${sec.toString().padStart(2, '0')}`
 }
 
-export default function PixPayment({ pixString, total, expiresAt }: Props) {
-  const [copied, setCopied]   = useState(false)
-  const [qrCode, setQrCode]   = useState('')
-  const [timeLeft, setTimeLeft] = useState<number | null>(null)
-  const [expired, setExpired]  = useState(false)
+export default function PixPayment({ pixString, total, expiresAt, orderId }: Props) {
+  const [copied,    setCopied]   = useState(false)
+  const [qrCode,    setQrCode]   = useState('')
+  const [timeLeft,  setTimeLeft] = useState<number | null>(null)
+  const [expired,   setExpired]  = useState(false)
+  const [confirmed, setConfirmed] = useState(false)
 
   useEffect(() => {
     QRCode.toDataURL(pixString, {
@@ -32,21 +35,33 @@ export default function PixPayment({ pixString, total, expiresAt }: Props) {
 
   useEffect(() => {
     const expiry = new Date(expiresAt).getTime()
-
     function tick() {
       const remaining = expiry - Date.now()
-      if (remaining <= 0) {
-        setExpired(true)
-        setTimeLeft(0)
-      } else {
-        setTimeLeft(remaining)
-      }
+      if (remaining <= 0) { setExpired(true); setTimeLeft(0) }
+      else setTimeLeft(remaining)
     }
-
     tick()
     const timer = setInterval(tick, 1000)
     return () => clearInterval(timer)
   }, [expiresAt])
+
+  /* polling de confirmação — verifica a cada 10s */
+  useEffect(() => {
+    if (expired || confirmed) return
+    const poll = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/pedidos/${orderId}/status`)
+        if (!res.ok) return
+        const { status } = await res.json()
+        if (status === 'pagamento_confirmado' || status === 'em_producao' || status === 'enviado' || status === 'entregue') {
+          setConfirmed(true)
+          clearInterval(poll)
+          toast.success('Pagamento confirmado! 🎉')
+        }
+      } catch { /* silently ignore network errors */ }
+    }, 10_000)
+    return () => clearInterval(poll)
+  }, [orderId, expired, confirmed])
 
   async function copyPix() {
     await navigator.clipboard.writeText(pixString)
@@ -55,9 +70,29 @@ export default function PixPayment({ pixString, total, expiresAt }: Props) {
     setTimeout(() => setCopied(false), 3000)
   }
 
-  const isUrgent = timeLeft !== null && timeLeft < 5 * 60 * 1000 && !expired
+  const isUrgent  = timeLeft !== null && timeLeft < 5 * 60 * 1000 && !expired
+  const whatsapp  = `https://wa.me/${WHATSAPP}?text=Ol%C3%A1!%20Meu%20c%C3%B3digo%20Pix%20expirou%20e%20preciso%20de%20um%20novo.`
 
-  const whatsapp = `https://wa.me/5562996394315?text=Olá!%20Meu%20código%20Pix%20expirou%20e%20preciso%20de%20um%20novo.`
+  if (confirmed) {
+    return (
+      <div className="bg-white rounded-card shadow-card p-8 text-center space-y-4">
+        <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+          <Check size={40} className="text-green-500" />
+        </div>
+        <div>
+          <h2 className="font-display text-2xl text-green-600">Pagamento confirmado!</h2>
+          <p className="text-sm text-gray-500 mt-1">Clara já recebeu e vai começar a produção em breve 🌸</p>
+        </div>
+        <a
+          href={`https://wa.me/${WHATSAPP}?text=Ol%C3%A1!%20Acabei%20de%20pagar%20o%20pedido%20%23${orderId.slice(0, 8).toUpperCase()}%20%F0%9F%8C%B8`}
+          target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-green-500 text-white font-semibold px-5 py-2.5 rounded-2xl hover:bg-green-600 transition-colors text-sm"
+        >
+          Avisar no WhatsApp
+        </a>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-white rounded-card shadow-card p-6 text-center space-y-4">
@@ -85,12 +120,8 @@ export default function PixPayment({ pixString, total, expiresAt }: Props) {
           </div>
           <p className="font-semibold text-red-500">PIX expirado</p>
           <p className="text-sm text-gray-500">O código Pix não é mais válido.</p>
-          <a
-            href={whatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-green-500 text-white font-semibold px-5 py-2.5 rounded-2xl hover:bg-green-600 transition-colors text-sm"
-          >
+          <a href={whatsapp} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-green-500 text-white font-semibold px-5 py-2.5 rounded-2xl hover:bg-green-600 transition-colors text-sm">
             Pedir novo código via WhatsApp
           </a>
         </div>
@@ -118,6 +149,8 @@ export default function PixPayment({ pixString, total, expiresAt }: Props) {
             </div>
           )}
 
+          <p className="text-xs text-gray-400 animate-pulse">Verificando pagamento automaticamente…</p>
+
           {/* Copia e cola */}
           <div>
             <p className="text-xs text-gray-400 mb-2">Ou copie o código Pix</p>
@@ -125,12 +158,10 @@ export default function PixPayment({ pixString, total, expiresAt }: Props) {
               <code className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-600 text-left overflow-hidden overflow-ellipsis whitespace-nowrap">
                 {pixString}
               </code>
-              <button
-                onClick={copyPix}
+              <button onClick={copyPix}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
                   copied ? 'bg-green-500 text-white' : 'bg-clara-rosa text-white hover:brightness-95'
-                }`}
-              >
+                }`}>
                 {copied ? <><Check size={14} /> Copiado</> : <><Copy size={14} /> Copiar</>}
               </button>
             </div>

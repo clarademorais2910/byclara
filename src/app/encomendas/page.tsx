@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { MessageCircle, Palette, Clock, Heart, CheckCircle } from 'lucide-react'
+import { WHATSAPP } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: 'Encomendas — By Clara',
@@ -40,7 +41,7 @@ const options = [
 ]
 
 export default function EncomendasPage() {
-  const whatsapp = 'https://wa.me/5562996394315?text=Olá%20Clara!%20Quero%20fazer%20uma%20encomenda%20de%20pulseira%20personalizada%20🌸'
+  const whatsapp = `https://wa.me/${WHATSAPP}?text=Ol%C3%A1%20Clara!%20Quero%20fazer%20uma%20encomenda%20de%20pulseira%20personalizada%20%F0%9F%8C%B8`
 
   return (
     <div className="min-h-screen flex flex-col">

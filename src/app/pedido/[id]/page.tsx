@@ -7,6 +7,7 @@ import { generatePixEMV } from '@/lib/pix'
 import { Package, MapPin, Truck } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import Link from 'next/link'
+import { WHATSAPP } from '@/lib/config'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -46,7 +47,7 @@ export default async function PedidoPage({ params }: Props) {
     : ''
 
   const status = STATUS_LABELS[order.status] ?? { label: order.status, color: 'text-gray-500' }
-  const whatsapp = `https://wa.me/5562996394315?text=Olá!%20Acabei%20de%20fazer%20o%20pedido%20%23${id.slice(0, 8).toUpperCase()}%20e%20já%20realizei%20o%20pagamento!`
+  const whatsapp = `https://wa.me/${WHATSAPP}?text=Ol%C3%A1!%20Acabei%20de%20fazer%20o%20pedido%20%23${id.slice(0, 8).toUpperCase()}%20e%20j%C3%A1%20realizei%20o%20pagamento!`
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -70,6 +71,7 @@ export default async function PedidoPage({ params }: Props) {
             pixString={pixString}
             total={order.total}
             expiresAt={order.pix_expires_at}
+            orderId={order.id}
           />
         )}
 

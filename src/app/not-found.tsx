@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import { WHATSAPP } from '@/lib/config'
 
 export default function NotFound() {
   return (
@@ -38,7 +39,7 @@ export default function NotFound() {
             Ir para a home
           </Link>
           <a
-            href="https://wa.me/5562996394315?text=Olá!%20Preciso%20de%20ajuda%20no%20site."
+            href={`https://wa.me/${WHATSAPP}?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20no%20site.`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 bg-green-500 text-white font-semibold px-6 py-3 rounded-2xl hover:bg-green-600 transition-all"

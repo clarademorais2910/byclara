@@ -3,8 +3,9 @@ import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CatalogoClient from '@/components/catalogo/CatalogoClient'
+import { Suspense } from 'react'
 
-export const revalidate = 60
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Catálogo — By Clara',
@@ -34,7 +35,9 @@ export default async function CatalogoPage() {
             <p className="text-sm text-gray-400 mt-1">Volte logo para ver as novidades</p>
           </div>
         ) : (
-          <CatalogoClient products={lista} />
+          <Suspense fallback={<div className="h-64 flex items-center justify-center text-gray-400 text-sm">Carregando…</div>}>
+            <CatalogoClient products={lista} />
+          </Suspense>
         )}
       </main>
       <Footer />
