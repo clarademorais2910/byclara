@@ -58,6 +58,9 @@ export default async function AdminPedidoDetailPage({ params }: Props) {
                     {item.personalizacao?.nomePersonalizado && (
                       <p className="text-xs text-gray-400">Nome: {item.personalizacao.nomePersonalizado}</p>
                     )}
+                    {item.personalizacao?.tamanho && (
+                      <p className="text-xs text-gray-400">Tamanho: {item.personalizacao.tamanho}</p>
+                    )}
                     {item.personalizacao?.coresEscolhidas?.length > 0 && (
                       <div className="flex gap-1 mt-0.5">
                         {item.personalizacao.coresEscolhidas.map((c: string) => (

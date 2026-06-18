@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware'
 export interface CartItemPersonalizacao {
   coresEscolhidas?: string[]
   nomePersonalizado?: string
+  tamanho?: string
 }
 
 export interface CartItem {

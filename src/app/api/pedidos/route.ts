@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
 
-    const required = ['customer_name', 'customer_phone', 'cep', 'logradouro', 'numero', 'shipping_type', 'shipping_price', 'subtotal']
+    const required = ['customer_name', 'customer_phone', 'cep', 'numero', 'shipping_type', 'shipping_price', 'subtotal']
     for (const f of required) {
       if (body[f] === undefined || body[f] === null || body[f] === '') {
         return NextResponse.json({ error: `Campo obrigatório ausente: ${f}` }, { status: 400 })

@@ -9,6 +9,7 @@ interface OrderItem {
   personalizacao?: {
     nomePersonalizado?: string
     coresEscolhidas?: string[]
+    tamanho?: string
   }
 }
 
@@ -41,6 +42,7 @@ function buildItemsHtml(items: OrderItem[]): string {
       <td style="padding: 8px 0; border-bottom: 1px solid #f3f3f3;">
         <strong>${esc(item.name)}</strong> ×${item.quantity}
         ${item.personalizacao?.nomePersonalizado ? `<br><small>Nome: ${esc(item.personalizacao.nomePersonalizado)}</small>` : ''}
+        ${item.personalizacao?.tamanho ? `<br><small>Tamanho: ${esc(item.personalizacao.tamanho)}</small>` : ''}
       </td>
       <td style="padding: 8px 0; border-bottom: 1px solid #f3f3f3; text-align: right;">
         ${formatPrice(item.price * item.quantity)}

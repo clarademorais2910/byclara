@@ -54,7 +54,9 @@ export default async function PedidoPage({ params }: Props) {
       <Header />
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-8 space-y-4">
 
-        <h1 className="font-display text-3xl text-clara-rosa text-center">Pedido confirmado!</h1>
+        <h1 className="font-display text-3xl text-clara-rosa text-center">
+          {order.status === 'aguardando_pagamento' ? 'Pedido recebido!' : 'Pedido confirmado!'}
+        </h1>
         <p className="text-center text-xs text-gray-400">
           #{id.slice(0, 8).toUpperCase()}
         </p>

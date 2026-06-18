@@ -172,7 +172,7 @@ export default function BraceletBuilder() {
     addItem({
       id: `custom-${Date.now()}`,
       productId: 'custom',
-      name: letters ? `Pulseira "${letters}"` : 'Pulseira Personalizada',
+      name: letters ? `Pulseira "${letters}" • ${size}` : `Pulseira Personalizada • ${size}`,
       price: 39.90,
       image: '',
       weightGrams: 14,
@@ -180,6 +180,7 @@ export default function BraceletBuilder() {
       personalizacao: {
         nomePersonalizado: letters || undefined,
         coresEscolhidas: hexes,
+        tamanho: size,
       },
     })
     setAdded(true)

@@ -51,6 +51,7 @@ export default function CheckoutForm() {
   // Step 2 — endereço
   const [cep, setCep]               = useState('')
   const [endereco, setEndereco]     = useState<Endereco | null>(null)
+  const [logradouroManual, setLogradouroManual] = useState('')
   const [numero, setNumero]         = useState('')
   const [complemento, setComplemento] = useState('')
   const [cepLoading, setCepLoading] = useState(false)
@@ -100,7 +101,7 @@ export default function CheckoutForm() {
           customer_phone: telefone,
           customer_email: email || null,
           cep,
-          logradouro:    endereco.logradouro,
+          logradouro:    endereco.logradouro || logradouroManual,
           numero,
           complemento,
           bairro:        endereco.bairro,
@@ -218,6 +219,17 @@ export default function CheckoutForm() {
                 {endereco.logradouro && <p>{endereco.logradouro}</p>}
                 <p>{endereco.bairro} — {endereco.cidade}/{endereco.estado}</p>
               </div>
+              {!endereco.logradouro && (
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">Rua / Logradouro *</label>
+                  <input
+                    value={logradouroManual}
+                    onChange={e => setLogradouroManual(e.target.value)}
+                    className="w-full border-2 border-gray-200 focus:border-clara-rosa rounded-2xl px-4 py-3 text-sm outline-none transition-colors"
+                    placeholder="Ex: Rua das Flores"
+                  />
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-semibold text-gray-500 block mb-1">Número *</label>
@@ -269,7 +281,7 @@ export default function CheckoutForm() {
               Voltar
             </button>
             <button
-              disabled={!endereco || !numero || !freteSelecionado}
+              disabled={!endereco || !numero || !freteSelecionado || (!endereco.logradouro && !logradouroManual)}
               onClick={() => setStep('revisar')}
               className="flex-1 bg-clara-rosa text-white font-semibold py-3 rounded-2xl hover:brightness-95 disabled:opacity-40 transition-all"
             >
@@ -289,7 +301,7 @@ export default function CheckoutForm() {
               <p className="font-semibold">{nome}</p>
               <p className="text-gray-500">{telefone}</p>
               {email && <p className="text-gray-500">{email}</p>}
-              <p className="text-gray-500">{endereco.logradouro}, {numero}{complemento ? `, ${complemento}` : ''}</p>
+              <p className="text-gray-500">{endereco.logradouro || logradouroManual}, {numero}{complemento ? `, ${complemento}` : ''}</p>
               <p className="text-gray-500">{endereco.bairro} — {endereco.cidade}/{endereco.estado} — {cep.replace(/(\d{5})(\d)/, '$1-$2')}</p>
             </div>
 
